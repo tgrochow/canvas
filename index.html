@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<title>canvas class test</title>
+
+<meta charset = "utf-8">
+<meta name = "viewport" content = "width=device-width,initial-scale=1.0">
+
+<script language = "javascript" type = "text/javascript" src = "js/gl_math.js"></script>
+<script language = "javascript" type = "text/javascript" src = "js/canvas.js"></script>
+
+<script language = "javascript" type = "text/javascript">
+
+var mouse_down = false;
+var mouse_pos  = new Float32Array([0.0,0.0]);
+
+  window.onload = function()
+  {
+    canvas.init('viewer_canvas');
+    canvas.enable_interaction();
+
+    var p1 = new Float32Array([-380.0,0.0,0.0]);
+    var p2 = new Float32Array([0.0,0.0,0.0]);
+    var p3 = new Float32Array([0.0,0.0,0.0]);
+    var p4 = new Float32Array([0.0,248.0,0.0]);
+    var p5 = new Float32Array([0.0,0.0,0.0]);
+    var p6 = new Float32Array([380.0,100.0,-250.0]);
+
+    var c1 = new Uint8Array([100,0,100]);
+    var c2 = new Uint8Array([0,0,100]);
+    var c3 = new Uint8Array([0,100,0]);
+
+    canvas.load_line(p1,p2,c1,c2);
+    canvas.load_line(p3,p4,c1,c2);
+    canvas.load_line(p5,p6,c1,c2);
+    canvas.load_line(p1,p4,c1,c2);
+
+    //canvas.remove_line(2);
+    //canvas.remove_line(2);
+
+    //canvas.set_line_color(2,c1,c3);
+
+    canvas.draw_line_primitives();
+
+    var pos   = new Float32Array([0.0,100.0,0.0]);
+    var dir   = new Float32Array([60.0,-60.0]);
+    var color = new Uint8Array([255.0,255.0,255.0]);
+
+    canvas.load_arrow_glyph(p2,dir,c1);
+    canvas.load_arrow_glyph(p1,dir,c2);
+    canvas.load_arrow_glyph(p4,dir,c3);
+    canvas.load_arrow_glyph(p6,dir,color);
+
+    canvas.draw_arrow_glyph_primitives();
+  };
+
+</script>
+
+</head>
+
+<body>
+
+<canvas id = "viewer_canvas" width = "1000" height = "600"></canvas>
+
+</body>
+
+</html>
