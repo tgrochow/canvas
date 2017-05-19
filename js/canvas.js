@@ -238,6 +238,7 @@ var canvas = new function()
 
     v.scale         = 1.0;
     v.translation   = new Float32Array([0.0,0.0,0.0]);
+    v.center        = new Float32Array([0.0,0.0,0.0]);
   };
 
   // set default values for uniform variables
@@ -252,8 +253,9 @@ var canvas = new function()
 
   this.enable_interaction = function()
   {
-    this.event_attr.mouse_down = false;
-    this.event_attr.mouse_pos  = new Float32Array([0.0,0.0]);
+    this.event_attr.mouse_down      = false;
+    this.event_attr.mouse_pos       = new Float32Array([0.0,0.0]);
+    this.event_attr.scale_mouse_pos = new Float32Array([0.0,0.0]);
 
     // mouse wheel event source:
     // https://www.sitepoint.com/html5-javascript-mouse-wheel/
@@ -313,6 +315,9 @@ var canvas = new function()
 
   this.scale = function(scale_shift)
   {
+    this.view_attr.center = vec2.scalar_mult(this.view_attr.scale,
+                                             this.event_attr.scale_mouse_pos);
+
     this.view_attr.scale += scale_shift;
 
     this.update_perspective_view();
@@ -858,6 +863,9 @@ function mouse_wheel_event(mouse_event)
 {
   var s = mouse_event.detail / -100.0;
 
+  canvas.event_attr.scale_mouse_pos[0] = mouse_event.clientX;
+  canvas.event_attr.scale_mouse_pos[1] = mouse_event.clientY;
+
   canvas.scale(s);
 
   canvas.draw_line_primitives();
@@ -885,11 +893,11 @@ function mouse_move_event(mouse_event)
 
     canvas.translate(v_t);
 
-    canvas.draw_line_primitives();
-    canvas.draw_arrow_glyph_primitives();
-
     canvas.event_attr.mouse_pos[0] = mouse_event.clientX;
     canvas.event_attr.mouse_pos[1] = mouse_event.clientY;
+
+    canvas.draw_line_primitives();
+    canvas.draw_arrow_glyph_primitives();
   }
 }
 
