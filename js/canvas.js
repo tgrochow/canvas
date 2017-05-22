@@ -251,11 +251,11 @@ var canvas = new function()
     this.gl_uniform_map.aspect_ratio = v.aspect_ratio;
   };
 
+  // enable default interaction
   this.enable_interaction = function()
   {
     this.event_attr.mouse_down      = false;
     this.event_attr.mouse_pos       = new Float32Array([0.0,0.0]);
-    this.event_attr.scale_mouse_pos = new Float32Array([0.0,0.0]);
 
     // mouse wheel event source:
     // https://www.sitepoint.com/html5-javascript-mouse-wheel/
@@ -313,16 +313,15 @@ var canvas = new function()
     this.update_perspective_view();
   };
 
+  // scale vertices around origin
   this.scale = function(scale_shift)
   {
-    this.view_attr.center = vec2.scalar_mult(this.view_attr.scale,
-                                             this.event_attr.scale_mouse_pos);
-
     this.view_attr.scale += scale_shift;
 
     this.update_perspective_view();
   };
 
+  // translate vertices
   this.translate = function(v_t)
   {
     var v_t_current = this.view_attr.translation;
@@ -537,7 +536,7 @@ var canvas = new function()
   };
 
   // remove one line from primitive array, recollect primitive data
-  this.remove_line = function(line_index,c1,c2)
+  this.remove_line = function(line_index)
   {
     // invalid line index
     if(typeof line_index != 'number' ||
@@ -806,6 +805,27 @@ var canvas = new function()
     this.upload_arrow_glyph_data();
   }
 
+  // remove one line from primitive array, recollect primitive data
+  this.remove_arrow_glyph = function(glyph_index)
+  {
+    // invalid line index
+    if(typeof glyph_index != 'number' ||
+       glyph_index <  0                ||
+       glyph_index >= this.primitive_list.arrow_glyph_array.length)
+    {
+      console.log('canvas: invalid arrow glyph index');
+      console.log('canvas: arrow glyph removal failed');
+      return;
+    }
+
+    // remove line from primitive list
+    this.primitive_list.arrow_glyph_array.splice(glyph_index,1);
+
+    // recollect primitive data from remaining lines
+    this.collect_arrow_glyph_data();
+    this.upload_arrow_glyph_data();
+  };
+
   // load arrow glyüph attributes and indices on GPU, define memory layout
   this.upload_arrow_glyph_data = function()
   {
@@ -857,14 +877,39 @@ var canvas = new function()
     this.gl_ctx.enableVertexAttribArray(loc);
     this.gl_ctx.vertexAttribPointer(loc,3,type,true,0,0);
   };
+
+  // reset line data, recollect data from remaining lines
+  this.collect_arrow_glyph_data = function()
+  {
+    var arrow_glyph_array = this.primitive_list.arrow_glyph_array;
+    var glyph             = null;
+
+    // reset line f32 attribute, index array
+    this.primitive_data.arrow_glyph_f32_attr    = [];
+    this.primitive_data.arrow_glyph_uint8_attr  = [];
+
+    // for every line
+    for(var glyph_index = 0 ;
+            glyph_index < arrow_glyph_array.length ; ++glyph_index)
+    {
+      // get current line
+      glyph = arrow_glyph_array[glyph_index];
+
+      // add current vertex attributes to collection
+      this.primitive_data.arrow_glyph_f32_attr =
+      this.primitive_data.arrow_glyph_f32_attr.concat(glyph.vertex_f32_attr);
+
+      this.primitive_data.arrow_glyph_uint8_attr =
+      this.primitive_data.arrow_glyph_uint8_attr.concat(glyph.vertex_uint8_attr);
+    }
+  }
 }
+
+
 
 function mouse_wheel_event(mouse_event)
 {
   var s = mouse_event.detail / -100.0;
-
-  canvas.event_attr.scale_mouse_pos[0] = mouse_event.clientX;
-  canvas.event_attr.scale_mouse_pos[1] = mouse_event.clientY;
 
   canvas.scale(s);
 
