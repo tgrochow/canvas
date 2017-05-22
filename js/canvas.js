@@ -251,6 +251,16 @@ var canvas = new function()
     this.gl_uniform_map.aspect_ratio = v.aspect_ratio;
   };
 
+  // resize the canvas
+  this.resize = function(width,height)
+  {
+    this.dom_canvas.width  = width;
+    this.dom_canvas.height = height;
+
+    this.gl_ctx.viewport(0,0,width,height);
+    this.update_aspect_ratio();
+  };
+
   // enable default interaction
   this.enable_interaction = function()
   {
