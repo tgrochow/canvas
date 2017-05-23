@@ -543,6 +543,9 @@ var canvas = new function()
 
     // upload line data to GPU
     this.upload_line_data();
+
+    // return line_index
+    return line_number;
   };
 
   // remove one line from primitive array, recollect primitive data
@@ -674,6 +677,24 @@ var canvas = new function()
     }
   };
 
+  this.get_line = function(line_index)
+  {
+    // invalid line index
+    if(typeof line_index != 'number' ||
+       line_index <  0                ||
+       line_index >= this.primitive_list.line_array.length)
+    {
+      console.log('canvas: invalid line index');
+      console.log('canvas: line removal failed');
+
+      return null;
+    }
+
+    var line = this.primitive_list.line_array[line_index];
+
+    return line;
+  }
+
   // change color after line initialization
   this.set_line_color = function(line_index,c1,c2)
   {
@@ -684,6 +705,7 @@ var canvas = new function()
     {
       console.log('canvas: invalid line index');
       console.log('canvas: line removal failed');
+
       return;
     }
 
@@ -813,6 +835,9 @@ var canvas = new function()
 
     // upload arrow glyph data to GPU
     this.upload_arrow_glyph_data();
+
+    // return glyph index
+    return (this.primitive_list.arrow_glyph_array.length - 1);
   }
 
   // remove one line from primitive array, recollect primitive data
